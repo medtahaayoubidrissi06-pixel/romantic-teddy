@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>You're So Beautiful 💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #ffe4f0 0%, #ffd6e8 40%, #fce4f5 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem 4rem;
+      font-family: 'Dancing Script', cursive;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background glow orbs */
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none;
+      animation: drift ease-in-out infinite alternate; filter: blur(40px);
+    }
+    @keyframes drift {
+      0%   { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-30px) scale(1.1); }
+    }
+
+    /* Falling petals */
+    .petal {
+      position: fixed; border-radius: 50% 0 50% 0;
+      pointer-events: none; opacity: 0;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Floating hearts */
+    .floaty-heart {
+      position: fixed; pointer-events: none; opacity: 0;
+      animation: riseHeart linear infinite;
+    }
+    @keyframes riseHeart {
+      0%   { transform: translateY(0) scale(0.6); opacity: 0.9; }
+      100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Page title */
+    .title {
+      font-size: clamp(1.8rem, 5.5vw, 3rem);
+      color: #b03060;
+      text-shadow: 0 2px 20px #f9b8d0, 0 0 40px #f9b8d0;
+      margin-bottom: 1.4rem;
+      letter-spacing: 2px;
+      text-align: center;
+      animation: titlePulse 4s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%, 100% { text-shadow: 0 2px 20px #f9b8d0, 0 0 40px #f9b8d0; }
+      50%       { text-shadow: 0 2px 30px #f070a0, 0 0 60px #f070a0; }
+    }
+
+    /* Bear */
+    .bear-wrap {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      animation: bearBob 3.8s ease-in-out infinite;
+      filter: drop-shadow(0 20px 40px rgba(180,80,100,0.18));
+    }
+    @keyframes bearBob {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50%       { transform: translateY(-14px) rotate(1.2deg); }
+    }
+    .bear-svg { width: min(320px, 85vw); }
+
+    /* TAP BUTTON */
+    .tap-btn {
+      margin-top: 1.8rem;
+      padding: 0.75rem 2.4rem;
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #e8245e 0%, #ff6b9d 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 30px rgba(220,40,100,0.35), 0 0 0 4px rgba(255,180,210,0.4);
+      letter-spacing: 1px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      animation: btnPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 6px 30px rgba(220,40,100,0.35), 0 0 0 4px rgba(255,180,210,0.4); }
+      50%       { box-shadow: 0 8px 40px rgba(220,40,100,0.55), 0 0 0 8px rgba(255,180,210,0.25); }
+    }
+    .tap-btn:active { transform: scale(0.96); }
+    .tap-btn.hidden { display: none; }
+
+    /* Messages revealed after tap */
+    .messages {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+      margin-top: 1.6rem;
+      width: 100%;
+      max-width: 420px;
+    }
+    .messages.show { display: flex; }
+
+    .msg-line {
+      font-size: clamp(1.3rem, 4.5vw, 2rem);
+      color: #c0326a;
+      text-shadow: 0 2px 12px #f9b8d0;
+      text-align: center;
+      letter-spacing: 1px;
+      opacity: 0;
+      transform: translateY(18px) scale(0.95);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .msg-line.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* subtitle / footer */
+    .subtitle {
+      font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+      color: #c0426e;
+      margin-top: 1.4rem;
+      letter-spacing: 1px;
+      text-align: center;
+      animation: subPulse 2.8s ease-in-out infinite;
+    }
+    @keyframes subPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.65; }
+    }
+
+    @media (max-width: 420px) {
+      .title { font-size: 1.55rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Orbs -->
+<div class="orb" style="width:320px;height:320px;background:rgba(255,180,210,0.35);top:5%;left:-8%;animation-duration:7s;"></div>
+<div class="orb" style="width:260px;height:260px;background:rgba(255,160,200,0.28);top:10%;right:-6%;animation-duration:9s;animation-delay:1s;"></div>
+<div class="orb" style="width:200px;height:200px;background:rgba(245,170,220,0.3);bottom:12%;left:4%;animation-duration:8s;animation-delay:2s;"></div>
+<div class="orb" style="width:280px;height:280px;background:rgba(255,190,225,0.25);bottom:8%;right:2%;animation-duration:10s;animation-delay:0.5s;"></div>
+
+<!-- Floating hearts -->
+<div class="floaty-heart" style="left:8%;animation-duration:5s;animation-delay:0s;font-size:1.2rem;">💗</div>
+<div class="floaty-heart" style="left:20%;animation-duration:7s;animation-delay:1.5s;font-size:1.6rem;">💕</div>
+<div class="floaty-heart" style="left:35%;animation-duration:6s;animation-delay:3s;font-size:1rem;">💖</div>
+<div class="floaty-heart" style="right:15%;animation-duration:8s;animation-delay:0.8s;font-size:1.4rem;">💗</div>
+<div class="floaty-heart" style="right:28%;animation-duration:5.5s;animation-delay:2.2s;font-size:1.1rem;">💓</div>
+<div class="floaty-heart" style="right:5%;animation-duration:7.5s;animation-delay:4s;font-size:1.5rem;">💕</div>
+<div class="floaty-heart" style="left:50%;animation-duration:6.5s;animation-delay:1s;font-size:1.3rem;">💖</div>
+<div class="floaty-heart" style="left:75%;animation-duration:9s;animation-delay:3.5s;font-size:1rem;">💗</div>
+
+<div class="title">✨ A Message For You ✨</div>
+
+<!-- BEAR SVG — two mouths, toggled by JS -->
+<div class="bear-wrap">
+  <svg id="bearSvg" class="bear-svg" viewBox="0 0 340 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bodyGrad" cx="45%" cy="35%" r="60%">
+        <stop offset="0%" stop-color="#f9d0b0"/>
+        <stop offset="50%" stop-color="#e8a070"/>
+        <stop offset="100%" stop-color="#c07040"/>
+      </radialGradient>
+      <radialGradient id="bodyGradDark" cx="55%" cy="60%" r="50%">
+        <stop offset="0%" stop-color="#c07040"/>
+        <stop offset="100%" stop-color="#a05828"/>
+      </radialGradient>
+      <radialGradient id="tummyGrad" cx="50%" cy="35%" r="60%">
+        <stop offset="0%" stop-color="#fef0e4"/>
+        <stop offset="100%" stop-color="#f5cfa8"/>
+      </radialGradient>
+      <radialGradient id="earInner" cx="50%" cy="40%" r="55%">
+        <stop offset="0%" stop-color="#f0a880"/>
+        <stop offset="100%" stop-color="#d07848"/>
+      </radialGradient>
+      <radialGradient id="heartGrad" cx="38%" cy="28%" r="65%">
+        <stop offset="0%" stop-color="#ff8bb8"/>
+        <stop offset="45%" stop-color="#e8245e"/>
+        <stop offset="100%" stop-color="#8a0830"/>
+      </radialGradient>
+      <radialGradient id="noseGrad" cx="40%" cy="35%" r="60%">
+        <stop offset="0%" stop-color="#5a2818"/>
+        <stop offset="100%" stop-color="#2e1008"/>
+      </radialGradient>
+      <radialGradient id="teethGrad" cx="50%" cy="30%" r="60%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#f0e8e0"/>
+      </radialGradient>
+      <filter id="softShadow" x="-25%" y="-25%" width="150%" height="150%">
+        <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#b05028" flood-opacity="0.22"/>
+      </filter>
+      <filter id="heartGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#c0144e" flood-opacity="0.4"/>
+        <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ff80b0" flood-opacity="0.3"/>
+      </filter>
+      <filter id="headShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#a04820" flood-opacity="0.28"/>
+      </filter>
+    </defs>
+
+    <!-- Ground shadow -->
+    <ellipse cx="170" cy="415" rx="85" ry="10" fill="#c07040" opacity="0.15"/>
+
+    <!-- LEFT EAR -->
+    <circle cx="98" cy="92" r="34" fill="url(#bodyGrad)" filter="url(#softShadow)"/>
+    <circle cx="98" cy="92" r="20" fill="url(#earInner)"/>
+    <circle cx="91" cy="83" r="6" fill="white" opacity="0.18"/>
+
+    <!-- RIGHT EAR -->
+    <circle cx="242" cy="92" r="34" fill="url(#bodyGrad)" filter="url(#softShadow)"/>
+    <circle cx="242" cy="92" r="20" fill="url(#earInner)"/>
+    <circle cx="235" cy="83" r="6" fill="white" opacity="0.18"/>
+
+    <!-- BODY -->
+    <ellipse cx="170" cy="306" rx="92" ry="112" fill="url(#bodyGrad)" filter="url(#softShadow)"/>
+    <ellipse cx="170" cy="370" rx="80" ry="50" fill="url(#bodyGradDark)" opacity="0.35"/>
+    <!-- TUMMY -->
+    <ellipse cx="170" cy="308" rx="56" ry="70" fill="url(#tummyGrad)"/>
+
+    <!-- HEAD -->
+    <circle cx="170" cy="162" r="92" fill="url(#bodyGrad)" filter="url(#headShadow)"/>
+    <ellipse cx="148" cy="110" rx="35" ry="22" fill="white" opacity="0.12" transform="rotate(-20,148,110)"/>
+
+    <!-- SNOUT -->
+    <ellipse cx="170" cy="195" rx="40" ry="29" fill="url(#tummyGrad)"/>
+    <ellipse cx="158" cy="188" rx="10" ry="7" fill="white" opacity="0.22"/>
+
+    <!-- EYES -->
+    <circle cx="141" cy="154" r="16" fill="#1a0806"/>
+    <circle cx="141" cy="154" r="14" fill="#2a1008"/>
+    <circle cx="147" cy="148" r="5" fill="white" opacity="0.9"/>
+    <circle cx="144" cy="146" r="2.5" fill="white" opacity="0.5"/>
+
+    <circle cx="199" cy="154" r="16" fill="#1a0806"/>
+    <circle cx="199" cy="154" r="14" fill="#2a1008"/>
+    <circle cx="205" cy="148" r="5" fill="white" opacity="0.9"/>
+    <circle cx="202" cy="146" r="2.5" fill="white" opacity="0.5"/>
+
+    <!-- EYEBROWS — neutral -->
+    <g id="browsNeutral">
+      <path d="M128 133 Q141 124 154 132" stroke="#7a3e18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M186 132 Q199 123 212 131" stroke="#7a3e18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- EYEBROWS — happy (raised & arched more) -->
+    <g id="browsHappy" style="display:none">
+      <path d="M126 127 Q141 116 155 126" stroke="#7a3e18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M185 126 Q200 115 213 125" stroke="#7a3e18" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- NOSE -->
+    <ellipse cx="170" cy="187" rx="14" ry="9.5" fill="url(#noseGrad)"/>
+    <ellipse cx="165" cy="184" rx="4.5" ry="3" fill="white" opacity="0.3"/>
+
+    <!-- MOUTH neutral (gentle smile) -->
+    <g id="mouthNeutral">
+      <path d="M156 203 Q170 218 184 203" stroke="#2e1008" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M170 203 L170 210" stroke="#2e1008" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <!-- MOUTH happy — big open smile with teeth -->
+    <g id="mouthHappy" style="display:none">
+      <!-- open smile outer -->
+      <path d="M150 200 Q170 228 190 200" stroke="#2e1008" stroke-width="3" fill="#c04848" stroke-linecap="round"/>
+      <!-- teeth -->
+      <path d="M152 202 Q170 226 188 202" fill="url(#teethGrad)" stroke="none"/>
+      <!-- teeth dividers -->
+      <line x1="170" y1="202" x2="170" y2="220" stroke="#e0d0c8" stroke-width="1.5"/>
+      <line x1="160" y1="202" x2="158" y2="218" stroke="#e0d0c8" stroke-width="1.5"/>
+      <line x1="180" y1="202" x2="182" y2="218" stroke="#e0d0c8" stroke-width="1.5"/>
+      <!-- tongue -->
+      <ellipse cx="170" cy="220" rx="9" ry="5" fill="#e05878" opacity="0.85"/>
+    </g>
+
+    <!-- BLUSH — brighter when happy -->
+    <ellipse id="blushL" cx="122" cy="188" rx="19" ry="11" fill="#f08090" opacity="0.4"/>
+    <ellipse id="blushR" cx="218" cy="188" rx="19" ry="11" fill="#f08090" opacity="0.4"/>
+
+    <!-- LEFT ARM -->
+    <path d="M83 278 Q36 242 52 178" stroke="#d88858" stroke-width="44" fill="none" stroke-linecap="round"/>
+    <path d="M83 278 Q36 242 52 178" stroke="#e8a878" stroke-width="30" fill="none" stroke-linecap="round" opacity="0.4"/>
+    <ellipse cx="52" cy="173" rx="22" ry="17" fill="#c07848" transform="rotate(-18,52,173)"/>
+    <ellipse cx="44" cy="168" rx="8" ry="6" fill="white" opacity="0.15" transform="rotate(-18,44,168)"/>
+
+    <!-- RIGHT ARM -->
+    <path d="M257 278 Q304 242 288 178" stroke="#d88858" stroke-width="44" fill="none" stroke-linecap="round"/>
+    <path d="M257 278 Q304 242 288 178" stroke="#e8a878" stroke-width="30" fill="none" stroke-linecap="round" opacity="0.4"/>
+    <ellipse cx="288" cy="173" rx="22" ry="17" fill="#c07848" transform="rotate(18,288,173)"/>
+    <ellipse cx="296" cy="168" rx="8" ry="6" fill="white" opacity="0.15" transform="rotate(18,296,168)"/>
+
+    <!-- HEART held by paws -->
+    <g filter="url(#heartGlow)">
+      <path d="M170 290 C170 290 72 248 72 183 C72 150 98 124 136 124 C155 124 170 138 170 138 C170 138 185 124 204 124 C242 124 268 150 268 183 C268 248 170 290 170 290Z" fill="url(#heartGrad)"/>
+      <path d="M100 150 Q124 133 150 142" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.35"/>
+      <ellipse cx="108" cy="162" rx="10" ry="7" fill="white" opacity="0.18" transform="rotate(-30,108,162)"/>
+    </g>
+
+    <!-- Heart text — hidden until tapped -->
+    <g id="heartText" style="display:none">
+      <text x="170" y="186" text-anchor="middle" font-family="'Dancing Script',cursive" font-size="17" font-weight="700" fill="white" opacity="0.95" style="filter:drop-shadow(0 1px 4px rgba(100,0,30,0.6))">you&apos;re so</text>
+      <text x="170" y="213" text-anchor="middle" font-family="'Dancing Script',cursive" font-size="23" font-weight="700" fill="white" opacity="1" style="filter:drop-shadow(0 2px 6px rgba(100,0,30,0.7))">beautiful</text>
+    </g>
+
+    <!-- LEGS -->
+    <ellipse cx="133" cy="396" rx="38" ry="24" fill="url(#bodyGrad)"/>
+    <ellipse cx="207" cy="396" rx="38" ry="24" fill="url(#bodyGrad)"/>
+    <ellipse cx="126" cy="410" rx="30" ry="11" fill="#b06030"/>
+    <ellipse cx="214" cy="410" rx="30" ry="11" fill="#b06030"/>
+    <circle cx="108" cy="410" r="5.5" fill="#9a5028"/>
+    <circle cx="126" cy="417" r="5.5" fill="#9a5028"/>
+    <circle cx="144" cy="410" r="5.5" fill="#9a5028"/>
+    <circle cx="196" cy="410" r="5.5" fill="#9a5028"/>
+    <circle cx="214" cy="417" r="5.5" fill="#9a5028"/>
+    <circle cx="232" cy="410" r="5.5" fill="#9a5028"/>
+
+    <!-- BOW TIE -->
+    <path d="M146 244 L170 258 L194 244 L170 230Z" fill="#e8245e" opacity="0.95"/>
+    <circle cx="170" cy="244" r="9" fill="#b01040"/>
+    <ellipse cx="170" cy="244" rx="5" ry="3.5" fill="#ff80a8" opacity="0.45"/>
+    <circle cx="167" cy="241" r="2" fill="white" opacity="0.35"/>
+  </svg>
+</div>
+
+<!-- TAP BUTTON -->
+<button class="tap-btn" id="tapBtn" onclick="revealMessage()">💖 Tap Here 💖</button>
+
+<!-- MESSAGES revealed one by one -->
+<div class="messages" id="msgBox">
+  <div class="msg-line">💕 you&apos;re so beautiful 💕</div>
+  <div class="msg-line">🌸 you light up every room 🌸</div>
+  <div class="msg-line">✨ your smile is pure magic ✨</div>
+  <div class="msg-line">💗 you are loved so deeply 💗</div>
+  <div class="msg-line">🌹 never forget how special you are 🌹</div>
+</div>
+
+<div class="subtitle" id="footer" style="display:none">💕 You are loved, always 💕</div>
+
+<script>
+  function revealMessage() {
+    // Swap bear face to happy
+    document.getElementById('mouthNeutral').style.display = 'none';
+    document.getElementById('mouthHappy').style.display   = 'block';
+    document.getElementById('browsNeutral').style.display = 'none';
+    document.getElementById('browsHappy').style.display   = 'block';
+    document.getElementById('blushL').setAttribute('opacity','0.7');
+    document.getElementById('blushR').setAttribute('opacity','0.7');
+    document.getElementById('heartText').style.display    = 'block';
+
+    // Hide button
+    document.getElementById('tapBtn').classList.add('hidden');
+
+    // Show message container
+    var msgBox = document.getElementById('msgBox');
+    msgBox.classList.add('show');
+
+    // Reveal each line with a stagger
+    var lines = msgBox.querySelectorAll('.msg-line');
+    lines.forEach(function(line, i) {
+      setTimeout(function() { line.classList.add('visible'); }, 300 + i * 450);
+    });
+
+    // Show footer after all lines
+    setTimeout(function() {
+      document.getElementById('footer').style.display = 'block';
+    }, 300 + lines.length * 450 + 300);
+  }
+
+  // Falling petals
+  var colors = ['#f9b0cc','#f4a0c0','#fcc0d8','#f080a8','#e870a0','#ffd0e8'];
+  for (var i = 0; i < 22; i++) {
+    (function() {
+      var p = document.createElement('div');
+      p.className = 'petal';
+      p.style.left              = Math.random() * 100 + 'vw';
+      p.style.top               = '-20px';
+      p.style.background        = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDuration = (4 + Math.random() * 8) + 's';
+      p.style.animationDelay    = (Math.random() * 10) + 's';
+      p.style.width             = (8  + Math.random() * 10) + 'px';
+      p.style.height            = (12 + Math.random() * 12) + 'px';
+      p.style.opacity           = (0.5 + Math.random() * 0.5).toString();
+      document.body.appendChild(p);
+    })();
+  }
+</script>
+</body>
+</html>
